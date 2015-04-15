@@ -1,9 +1,9 @@
-# Creates pseudo distributed hadoop 2.6.0 on Ubuntu 14.04
+# Creates pseudo distributed hadoop 2.2.0 on Ubuntu 14.04
 #
-# docker build -t sequenceiq/hadoop-ubuntu:2.6.0 .
+# docker build -t necoma/matatabi:2.2.0 .
 
 FROM sequenceiq/pam:ubuntu-14.04
-MAINTAINER SequenceIQ
+MAINTAINER NECOMA
 
 USER root
 
@@ -27,9 +27,14 @@ RUN mkdir -p /usr/java/default && \
 ENV JAVA_HOME /usr/java/default/
 ENV PATH $PATH:$JAVA_HOME/bin
 
-# hadoop
-RUN curl -s http://www.eu.apache.org/dist/hadoop/common/hadoop-2.6.0/hadoop-2.6.0.tar.gz | tar -xz -C /usr/local/
-RUN cd /usr/local && ln -s ./hadoop-2.6.0 hadoop
+# hadoop, hive, presto
+RUN curl -s https://archive.apache.org/dist/hadoop/core/hadoop-2.2.0/hadoop-2.2.0.tar.gz | tar -xz -C /usr/local/
+RUN cd /usr/local && ln -s ./hadoop-2.2.0 hadoop
+RUN curl -s http://mirror.sdunix.com/apache/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.66/presto-server-0.66.tar.gz | tar -xz -C /usr/local/
+RUN cd /usr/local && ln -s ./presto-server-0.66 presto
+RUN mkdir -p /usr/local/presto/etc
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.100/presto-cli-0.100-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
 
 ENV HADOOP_PREFIX /usr/local/hadoop
 RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport HADOOP_PREFIX=/usr/local/hadoop\nexport HADOOP_HOME=/usr/local/hadoop\n:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
@@ -49,9 +54,15 @@ ADD yarn-site.xml $HADOOP_PREFIX/etc/hadoop/yarn-site.xml
 
 RUN $HADOOP_PREFIX/bin/hdfs namenode -format
 
+# presto
+ADD presto.config.properties /usr/local/presto/etc/config.properties
+ADD presto.jvm.config /usr/local/presto/etc/jvm.config
+ADD presto.sh /usr/local/presto/bin/presto
+RUN chmod 755 /usr/local/presto/bin/presto
+
 # fixing the libhadoop.so like a boss
-RUN rm  /usr/local/hadoop/lib/native/*
-RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
+#RUN rm  /usr/local/hadoop/lib/native/*
+#RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
 ADD ssh_config /root/.ssh/config
 RUN chmod 600 /root/.ssh/config
@@ -71,6 +82,9 @@ RUN chmod 700 /etc/bootstrap.sh
 
 ENV BOOTSTRAP /etc/bootstrap.sh
 
+ADD bash.bashrc /root/.bashrc
+ADD bash.bashrc /root/.profile
+
 # workingaround docker.io build error
 RUN ls -la /usr/local/hadoop/etc/hadoop/*-env.sh
 RUN chmod +x /usr/local/hadoop/etc/hadoop/*-env.sh
@@ -85,6 +99,7 @@ RUN echo "Port 2122" >> /etc/ssh/sshd_config
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
 
-CMD ["/etc/bootstrap.sh", "-d"]
+CMD ["/etc/bootstrap.sh", "-bash"]
+#CMD ["/etc/bootstrap.sh", "-d"]
 
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030

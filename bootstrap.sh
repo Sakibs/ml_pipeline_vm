@@ -17,6 +17,8 @@ service ssh start
 $HADOOP_PREFIX/sbin/start-dfs.sh
 $HADOOP_PREFIX/sbin/start-yarn.sh
 
+/usr/local/presto/bin/launcher start
+
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
 fi
