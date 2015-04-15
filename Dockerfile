@@ -7,6 +7,9 @@ MAINTAINER NECOMA
 
 USER root
 
+# http://stackoverflow.com/questions/20635472/using-the-run-instruction-in-a-dockerfile-with-source-does-not-work
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
 # install dev tools
 RUN apt-get update
 RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync
@@ -21,7 +24,7 @@ RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
 # java
 RUN mkdir -p /usr/java/default && \
-    curl -Ls 'http://download.oracle.com/otn-pub/java/jdk/7u51-b13/jdk-7u51-linux-x64.tar.gz' -H 'Cookie: oraclelicense=accept-securebackup-cookie' | \
+    curl -Ls 'http://download.oracle.com/otn-pub/java/jdk/7u79-b14/jdk-7u79-linux-x64.tar.gz' -H 'Cookie: oraclelicense=accept-securebackup-cookie' | \
     tar --strip-components=1 -xz -C /usr/java/default/
 
 ENV JAVA_HOME /usr/java/default/
