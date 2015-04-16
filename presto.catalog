@@ -1,0 +1,2 @@
+connector.name=hive-cdh5
+hive.metastore.uri=thrift://localhost:10000

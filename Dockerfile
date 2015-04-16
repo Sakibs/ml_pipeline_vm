@@ -11,8 +11,10 @@ USER root
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 # install dev tools
+RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
+RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -28,21 +30,39 @@ RUN mkdir -p /usr/java/default && \
     tar --strip-components=1 -xz -C /usr/java/default/
 
 ENV JAVA_HOME /usr/java/default/
-ENV PATH $PATH:$JAVA_HOME/bin
+ENV PATH /usr/local/presto/bin:/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH:$JAVA_HOME/bin
 
-# hadoop, hive, presto
+# hadoop
 RUN curl -s https://archive.apache.org/dist/hadoop/core/hadoop-2.2.0/hadoop-2.2.0.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./hadoop-2.2.0 hadoop
+
+# hive
+RUN service mysql start
 RUN curl -s http://mirror.sdunix.com/apache/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
+ADD hive-site.xml /usr/local/apache-hive-0.13.1-bin/conf/hive-site.xml
+ADD extlibs/mysql-connector-java-5.1.18-bin.jar /usr/local/apache-hive-0.13.1-bin/lib/mysql-connector-java-5.1.18-bin.jar
+ADD mysql-hive.sql /root/mysql-hive.sql
+ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT-jar-with-dependencies.jar /usr/local/apache-hive-0.13.1-bin/lib/
+ADD extlibs/json-hive-serde-1.0.jar /usr/local/apache-hive-0.13.1-bin/lib/
+
+# presto
 RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.66/presto-server-0.66.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./presto-server-0.66 presto
 RUN mkdir -p /usr/local/presto/etc
-RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.100/presto-cli-0.100-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.54/presto-cli-0.54-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
+RUN chmod 755 /usr/local/presto/bin/presto-cli-0.100-executable.jar
+RUN mkdir -p /home/hadoop/downloads/
+ADD extlibs/json-hive-serde-1.0.jar /usr/local/presto/plugin/hive-cdh5/
+ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT-jar-with-dependencies.jar /usr/local/presto/plugin/hive-cdh5/
+ADD extlibs/json-hive-serde-1.0.jar /home/hadoop/downloads/json-hive-serde-1.0.jar
 
 ENV HADOOP_PREFIX /usr/local/hadoop
 RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport HADOOP_PREFIX=/usr/local/hadoop\nexport HADOOP_HOME=/usr/local/hadoop\n:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 #RUN . $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+
+# additional packages
+RUN pip install pyhive
 
 RUN mkdir $HADOOP_PREFIX/input
 RUN cp $HADOOP_PREFIX/etc/hadoop/*.xml $HADOOP_PREFIX/input
@@ -57,9 +77,14 @@ ADD yarn-site.xml $HADOOP_PREFIX/etc/hadoop/yarn-site.xml
 
 RUN $HADOOP_PREFIX/bin/hdfs namenode -format
 
+# hiveserver
+ADD hiveserver.sh  /root/hiveserver.sh
+ADD hiveserver2.sh  /root/hiveserver2.sh
+
 # presto
 ADD presto.config.properties /usr/local/presto/etc/config.properties
 ADD presto.jvm.config /usr/local/presto/etc/jvm.config
+ADD presto.catalog /usr/local/presto/etc/catalog/hive.properties
 ADD presto.sh /usr/local/presto/bin/presto
 RUN chmod 755 /usr/local/presto/bin/presto
 
@@ -75,12 +100,8 @@ RUN chmod 600 /root/.ssh/config
 RUN chown root:root /root/.ssh/config
 
 # # installing supervisord
-# RUN yum install -y python-setuptools
-# RUN easy_install pip
-# RUN curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -o - | python
-# RUN pip install supervisor
-#
-# ADD supervisord.conf /etc/supervisord.conf
+RUN apt-get install -y supervisor
+ADD supervisord.conf /etc/supervisor/supervisord.conf
 
 ADD bootstrap.sh /etc/bootstrap.sh
 RUN chown root:root /etc/bootstrap.sh
@@ -88,8 +109,8 @@ RUN chmod 700 /etc/bootstrap.sh
 
 ENV BOOTSTRAP /etc/bootstrap.sh
 
-ADD bash.bashrc /root/.bashrc
-ADD bash.bashrc /root/.profile
+ADD bash.bashrc /.bashrc
+ADD bash.bashrc /.profile
 
 # workingaround docker.io build error
 RUN ls -la /usr/local/hadoop/etc/hadoop/*-env.sh
@@ -101,6 +122,9 @@ RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
 RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
+
+# install matatabi_script
+RUN git clone https://github.com/necoma/matatabi_script.git
 
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input

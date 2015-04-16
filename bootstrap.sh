@@ -14,8 +14,14 @@ sed s/HOSTNAME/$HOSTNAME/ /usr/local/hadoop/etc/hadoop/core-site.xml.template > 
 
 
 service ssh start
+service mysql start
 $HADOOP_PREFIX/sbin/start-dfs.sh
 $HADOOP_PREFIX/sbin/start-yarn.sh
+
+
+mysql -u root -ppassword < /root/mysql-hive.sql
+
+/etc/init.d/supervisor start
 
 /usr/local/presto/bin/launcher start
 

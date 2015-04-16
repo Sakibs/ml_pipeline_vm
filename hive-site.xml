@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
+<configuration>
+ 
+<property>
+  <name>javax.jdo.option.ConnectionUserName</name>
+  <value>APP</value>
+  <description>username to use against metastore database</description>
+</property>
+
+<property>
+  <name>javax.jdo.option.ConnectionPassword</name>
+  <value>mine</value>
+  <description>password to use against metastore database</description>
+</property>
+
+<!-- mysql version -->
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <value>jdbc:mysql://localhost/metastore</value>
+</property>
+ 
+<property>
+  <name>javax.jdo.option.ConnectionDriverName</name>
+  <value>com.mysql.jdbc.Driver</value>
+</property>
+ 
+<property>
+  <name>javax.jdo.option.ConnectionUserName</name>
+  <value>hiveuser</value>
+</property>
+ 
+<property>
+  <name>javax.jdo.option.ConnectionPassword</name>
+  <value>hive_password</value>
+</property>
+
+<property>
+  <name>datanucleus.fixedDatastore</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.exec.parallel</name>
+  <value>true</value>
+  <description>Whether to execute jobs in parallel</description>
+</property>
+
+ <property>
+   <name>hive.hwi.war.file</name>
+  <!--<value>lib/hive-hwi-0.12.0.war</value>-->
+   <description>This sets the path to the HWI war file, relative to ${HIVE_HOME}. </description>
+ </property>
+
+<property>
+  <name>hive.session.history.enabled</name>
+  <value>false</value>
+  <description>Whether to log Hive query, query plan, runtime statistics etc.</description>
+</property>
+
+<!-- for hadoop-2.2.0 -->
+<property>
+  <name>hadoop.config.dir</name>
+  <value>/usr/local/hadoop-2.2.0/etc/hadoop</value>
+</property>
+<property>
+  <name>mapred.job.tracker</name>
+  <value>localhost</value>
+</property>
+<property>
+    <name>mapreduce.jobtracker.address</name>
+    <value>localhost</value>
+</property>
+
+<!-- for hive access control -->
+<property>
+  <name>hive.server2.enable.doAs</name>
+  <value>false</value>
+  <description>
+   Setting this property to true will have HiveServer2 execute
+    Hive operations as the user making the calls to it.
+  </description>
+</property>
+
+<property>
+  <name>hive.security.authorization.enabled</name>
+  <value>false</value>
+  <description>enable or disable the Hive client authorization</description>
+</property>
+
+<property>
+  <name>hive.users.in.admin.role</name>
+  <value>root</value>
+  <description>Comma separated list of users who are in admin role for bootstrapping.
+    More users can be added in ADMIN role later.</description>
+</property>
+
+
+</configuration>
