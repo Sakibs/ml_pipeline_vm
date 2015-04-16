@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source $HOME/.bashrc
+source /.bashrc
 
 
 echo "============= Initializing Hive Tables ===================="

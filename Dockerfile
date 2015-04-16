@@ -96,7 +96,7 @@ RUN chmod 755 /usr/local/presto/bin/presto
 RUN rm  /usr/local/hadoop/lib/native/*
 ADD hadoop-native-64-2.2.0.tar.gz /usr/local/hadoop/lib/native/
 RUN ldconfig /usr/local/hadoop/lib/native/
-RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so && ln -s libgplcompression.so.0.0.0  libgplcompression.so
+RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so && ln -s libgplcompression.so.0.0.0 libgplcompression.so
 #RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
 ADD ssh_config /root/.ssh/config
