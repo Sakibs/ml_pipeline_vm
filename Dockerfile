@@ -14,7 +14,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -35,14 +35,16 @@ ENV PATH /usr/local/presto/bin:/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PAT
 # hadoop
 RUN curl -s https://archive.apache.org/dist/hadoop/core/hadoop-2.2.0/hadoop-2.2.0.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./hadoop-2.2.0 hadoop
+ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/hadoop/share/hadoop/common/
 
 # hive
-RUN service mysql start
 RUN curl -s http://mirror.sdunix.com/apache/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
 ADD hive-site.xml /usr/local/apache-hive-0.13.1-bin/conf/hive-site.xml
 ADD extlibs/mysql-connector-java-5.1.18-bin.jar /usr/local/apache-hive-0.13.1-bin/lib/mysql-connector-java-5.1.18-bin.jar
 ADD mysql-hive.sql /root/mysql-hive.sql
+RUN service mysql start && mysql -u root -ppassword < /root/mysql-hive.sql
 ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT-jar-with-dependencies.jar /usr/local/apache-hive-0.13.1-bin/lib/
+ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/apache-hive-0.13.1-bin/lib/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/apache-hive-0.13.1-bin/lib/
 
 # presto
@@ -53,6 +55,7 @@ RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.54/p
 RUN chmod 755 /usr/local/presto/bin/presto-cli-0.100-executable.jar
 RUN mkdir -p /home/hadoop/downloads/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/presto/plugin/hive-cdh5/
+ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/presto/plugin/hive-cdh5/
 ADD extlibs/hadoop-pcap-lib-0.2-SNAPSHOT.jar /usr/local/presto/plugin/hive-cdh5/
 ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT.jar /usr/local/presto/plugin/hive-cdh5/
 ADD extlibs/json-hive-serde-1.0.jar /home/hadoop/downloads/json-hive-serde-1.0.jar
@@ -126,9 +129,11 @@ RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 # install matatabi_script
 RUN git clone https://github.com/necoma/matatabi_script.git
+ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
+RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && sleep 30 && /root/matatabi-hive-init.sh
 
-RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
-RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
+#RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
+#RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
 
 #CMD ["/etc/bootstrap.sh", "-bash"]
 CMD ["/etc/bootstrap.sh", "-d"]

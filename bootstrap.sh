@@ -18,12 +18,9 @@ service mysql start
 $HADOOP_PREFIX/sbin/start-dfs.sh
 $HADOOP_PREFIX/sbin/start-yarn.sh
 
-
-mysql -u root -ppassword < /root/mysql-hive.sql
-
 /etc/init.d/supervisor start
-
 /usr/local/presto/bin/launcher start
+
 
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
