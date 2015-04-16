@@ -9,14 +9,14 @@ It contains Apache Hadoop 2.2.0 with LZO native library, Hive 0.13.1, Presto 0.6
 If you'd like to try directly from the Dockerfile you can build the image as:
 
 ```
-docker build  -t necoma/matatabi:2.2.0 .
+docker build  -t necoma/matatabi
 ```
 # Pull the image
 
 The image is also released as an official Docker image from Docker's automated build repository - you can always pull or refer the image when launching containers.
 
 ```
-docker pull necoma/matatabi:2.2.0
+docker pull necoma/matatabi
 ```
 
 # Start a container
@@ -24,7 +24,7 @@ docker pull necoma/matatabi:2.2.0
 In order to use the Docker image you have just build or pulled use:
 
 ```
-docker run -i -t necoma/matatabi:2.2.0 /etc/bootstrap.sh -bash
+docker run -i -t necoma/matatabi /etc/bootstrap.sh -bash
 ```
 
 ## Testing
