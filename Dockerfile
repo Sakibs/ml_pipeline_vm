@@ -53,7 +53,8 @@ RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.54/p
 RUN chmod 755 /usr/local/presto/bin/presto-cli-0.100-executable.jar
 RUN mkdir -p /home/hadoop/downloads/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/presto/plugin/hive-cdh5/
-ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT-jar-with-dependencies.jar /usr/local/presto/plugin/hive-cdh5/
+ADD extlibs/hadoop-pcap-lib-0.2-SNAPSHOT.jar /usr/local/presto/plugin/hive-cdh5/
+ADD extlibs/hadoop-pcap-serde-0.2-SNAPSHOT.jar /usr/local/presto/plugin/hive-cdh5/
 ADD extlibs/json-hive-serde-1.0.jar /home/hadoop/downloads/json-hive-serde-1.0.jar
 
 ENV HADOOP_PREFIX /usr/local/hadoop
@@ -129,7 +130,7 @@ RUN git clone https://github.com/necoma/matatabi_script.git
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
 
-CMD ["/etc/bootstrap.sh", "-bash"]
-#CMD ["/etc/bootstrap.sh", "-d"]
+#CMD ["/etc/bootstrap.sh", "-bash"]
+CMD ["/etc/bootstrap.sh", "-d"]
 
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030
