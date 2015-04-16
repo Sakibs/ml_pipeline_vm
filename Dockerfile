@@ -96,7 +96,7 @@ RUN chmod 755 /usr/local/presto/bin/presto
 RUN rm  /usr/local/hadoop/lib/native/*
 ADD hadoop-native-64-2.2.0.tar.gz /usr/local/hadoop/lib/native/
 RUN ldconfig /usr/local/hadoop/lib/native/
-RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so
+RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so && ln -s libgplcompression.so.0.0.0  libgplcompression.so
 #RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
 ADD ssh_config /root/.ssh/config
@@ -130,7 +130,7 @@ RUN echo "Port 2122" >> /etc/ssh/sshd_config
 # install matatabi_script
 RUN git clone https://github.com/necoma/matatabi_script.git
 ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
-RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && sleep 30 && /root/matatabi-hive-init.sh
+RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && sleep 30 && /root/matatabi-hive-init.sh
 
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
