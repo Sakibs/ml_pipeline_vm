@@ -1,6 +1,6 @@
 # Creates pseudo distributed hadoop 2.2.0 on Ubuntu 14.04
 #
-# docker build -t necoma/matatabi:2.2.0 .
+# docker build -t necoma/matatabi .
 
 FROM sequenceiq/pam:ubuntu-14.04
 MAINTAINER NECOMA
