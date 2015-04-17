@@ -5,6 +5,9 @@
 FROM sequenceiq/pam:ubuntu-14.04
 MAINTAINER NECOMA
 
+ENV version 1.0
+LABEL version=${version}
+
 USER root
 
 # http://stackoverflow.com/questions/20635472/using-the-run-instruction-in-a-dockerfile-with-source-does-not-work
@@ -14,7 +17,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -128,14 +131,14 @@ RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 
 # install matatabi_script
-RUN git clone https://github.com/necoma/matatabi_script.git
+RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
 ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
 RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && sleep 30 && /root/matatabi-hive-init.sh
 
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
 
-#CMD ["/etc/bootstrap.sh", "-bash"]
-CMD ["/etc/bootstrap.sh", "-d"]
+CMD ["/etc/bootstrap.sh", "-bash"]
+#CMD ["/etc/bootstrap.sh", "-d"]
 
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030

@@ -24,7 +24,7 @@ docker pull necoma/matatabi
 In order to use the Docker image you have just build or pulled use:
 
 ```
-docker run -i -t necoma/matatabi /etc/bootstrap.sh -bash
+docker run -i -t necoma/matatabi
 ```
 
 ## Testing
