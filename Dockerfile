@@ -26,6 +26,16 @@ RUN ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key
 RUN ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa
 RUN cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
+ADD ssh_config /root/.ssh/config
+RUN chmod 600 /root/.ssh/config
+RUN chown root:root /root/.ssh/config
+
+# git clone matatabi_script 
+#RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
+RUN git clone https://github.com/necoma/matatabi_script.git
+# install NECOMAtter
+ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
+RUN service ssh start && /root/NECOMAtter-install.sh
 
 # java
 RUN mkdir -p /usr/java/default && \
@@ -102,9 +112,9 @@ RUN ldconfig /usr/local/hadoop/lib/native/
 RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so && ln -s libgplcompression.so.0.0.0 libgplcompression.so
 #RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
-ADD ssh_config /root/.ssh/config
-RUN chmod 600 /root/.ssh/config
-RUN chown root:root /root/.ssh/config
+#ADD ssh_config /root/.ssh/config
+#RUN chmod 600 /root/.ssh/config
+#RUN chown root:root /root/.ssh/config
 
 # # installing supervisord
 RUN apt-get install -y supervisor
@@ -130,10 +140,14 @@ RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 
-# install matatabi_script
-RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
+# install matatabi_script (git clone is already done.)
+#RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
 ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
-RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && sleep 30 && /root/matatabi-hive-init.sh
+RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /var/lib/neo4j/bin/neo4j start-no-wait && sleep 30 && /root/matatabi-hive-init.sh
+
+# install NECOMAtter
+#ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
+#RUN service ssh start && /root/NECOMAtter-install.sh
 
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
 #RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
@@ -142,3 +156,6 @@ CMD ["/etc/bootstrap.sh", "-bash"]
 #CMD ["/etc/bootstrap.sh", "-d"]
 
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030
+
+# for NECOMAtter, neo4j
+EXPOSE 8000 7474
