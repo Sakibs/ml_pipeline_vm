@@ -16,5 +16,6 @@ export LD_LIBRARY_PATH=$JAVA_HOME/jre/lib/amd64:$JAVA_HOME/jre/lib/amd64/server:
 
 export HADOOP_OPTS="$HADOOP_OPTS -Djava.library.path=$HADOOP_HOME/lib/native/"
 export HADOOP_COMMON_LIB_NATIVE_DIR="$HADOOP_HOME/lib/native/"
+export PYTHONPATH=$PYTHONPATH:$HIVE_HOME/lib/py/
 
 PATH=/usr/local/hadoop/bin:/usr/local/hadoop/sbin:${PATH}

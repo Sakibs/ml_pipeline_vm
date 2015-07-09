@@ -139,11 +139,13 @@ RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
 RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
+# for hiveserver
+EXPOSE 10000
 
 # install matatabi_script (git clone is already done.)
 #RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
 ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
-RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /var/lib/neo4j/bin/neo4j start-no-wait && sleep 30 && /root/matatabi-hive-init.sh
+RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /var/lib/neo4j/bin/neo4j start-no-wait && /etc/init.d/supervisor start && sleep 30 && /root/matatabi-hive-init.sh
 
 # install NECOMAtter
 #ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
