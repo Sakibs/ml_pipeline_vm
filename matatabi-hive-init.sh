@@ -27,3 +27,7 @@ mkdir -p /tmp/data/skyeye
 mkdir -p /tmp/data/feodo
 cd /tmp/data
 /matatabi_script/importer/abuse.ch/scripts/abusech_tracker.py
+
+# netflow
+/matatabi_script/importer/netflow/scripts/HiveInit.sh
+/matatabi_script/importer/netflow/scripts/put-netflow.sh 20150701

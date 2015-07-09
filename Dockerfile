@@ -17,7 +17,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -81,6 +81,10 @@ RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/had
 # additional packages
 RUN pip install pyhive
 
+# necoma-version nfdump
+RUN git clone https://github.com/necoma/nfdump
+RUN cd /nfdump && ./configure  --prefix=/usr && make && make install
+
 RUN mkdir $HADOOP_PREFIX/input
 RUN cp $HADOOP_PREFIX/etc/hadoop/*.xml $HADOOP_PREFIX/input
 
@@ -138,9 +142,6 @@ RUN ls -la /usr/local/hadoop/etc/hadoop/*-env.sh
 RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
 RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
-
-# for hiveserver
-EXPOSE 10000
 
 # install matatabi_script (git clone is already done.)
 #RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
