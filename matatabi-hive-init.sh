@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 source $HOME/.bashrc
 source /.bashrc
@@ -19,3 +19,11 @@ cd matatabi_script/importer/dns-querylog/scripts && ./cron.sh
 
 # TwitterStreamingLoagger
 /matatabi_script/importer/TwitterStreamingWatcher/scripts/HiveInit.sh
+
+# abuse.ch
+mkdir -p /tmp/data/palevo
+mkdir -p /tmp/data/zeus
+mkdir -p /tmp/data/skyeye
+mkdir -p /tmp/data/feodo
+cd /tmp/data
+/matatabi_script/importer/abuse.ch/scripts/abusech_tracker.py
