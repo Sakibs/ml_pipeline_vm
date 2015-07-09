@@ -51,7 +51,7 @@ RUN cd /usr/local && ln -s ./hadoop-2.2.0 hadoop
 ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/hadoop/share/hadoop/common/
 
 # hive
-RUN curl -s http://mirror.sdunix.com/apache/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
+RUN curl -s https://archive.apache.org/dist/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
 ADD hive-site.xml /usr/local/apache-hive-0.13.1-bin/conf/hive-site.xml
 ADD extlibs/mysql-connector-java-5.1.18-bin.jar /usr/local/apache-hive-0.13.1-bin/lib/mysql-connector-java-5.1.18-bin.jar
 ADD mysql-hive.sql /root/mysql-hive.sql
