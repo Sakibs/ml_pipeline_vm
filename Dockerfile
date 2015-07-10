@@ -9,6 +9,7 @@ ENV version 1.0
 LABEL version=${version}
 
 USER root
+ENV HOME /
 
 # http://stackoverflow.com/questions/20635472/using-the-run-instruction-in-a-dockerfile-with-source-does-not-work
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
