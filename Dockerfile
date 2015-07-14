@@ -77,7 +77,6 @@ ADD extlibs/json-hive-serde-1.0.jar /home/hadoop/downloads/json-hive-serde-1.0.j
 ENV HADOOP_PREFIX /usr/local/hadoop
 RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport HADOOP_PREFIX=/usr/local/hadoop\nexport HADOOP_HOME=/usr/local/hadoop\n:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
-#RUN . $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 
 # additional packages
 RUN pip install pyhive
@@ -115,13 +114,8 @@ RUN rm  /usr/local/hadoop/lib/native/*
 ADD hadoop-native-64-2.2.0.tar.gz /usr/local/hadoop/lib/native/
 RUN ldconfig /usr/local/hadoop/lib/native/
 RUN cd /usr/local/hadoop/lib/native/ &&ln -s libhadoop.so.1.0.0 libhadoop.so &&ln -s libhdfs.so.0.0.0 libhdfs.so && ln -s libgplcompression.so.0.0.0 libgplcompression.so
-#RUN curl -Ls http://dl.bintray.com/sequenceiq/sequenceiq-bin/hadoop-native-64-2.6.0.tar|tar -x -C /usr/local/hadoop/lib/native/
 
-#ADD ssh_config /root/.ssh/config
-#RUN chmod 600 /root/.ssh/config
-#RUN chown root:root /root/.ssh/config
-
-# # installing supervisord
+# installing supervisord
 RUN apt-get install -y supervisor
 ADD supervisord.conf /etc/supervisor/supervisord.conf
 
@@ -145,16 +139,8 @@ RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 # install matatabi_script (git clone is already done.)
-#RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
 ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
 RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /var/lib/neo4j/bin/neo4j start-no-wait && /etc/init.d/supervisor start && sleep 30 && /root/matatabi-hive-init.sh
-
-# install NECOMAtter
-#ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
-#RUN service ssh start && /root/NECOMAtter-install.sh
-
-#RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -mkdir -p /user/root
-#RUN service ssh start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/bin/hdfs dfs -put $HADOOP_PREFIX/etc/hadoop/ input
 
 CMD ["/etc/bootstrap.sh", "-bash"]
 #CMD ["/etc/bootstrap.sh", "-d"]
