@@ -18,7 +18,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison ruby
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa

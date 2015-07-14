@@ -31,3 +31,11 @@ cd /tmp/data
 # netflow
 /matatabi_script/importer/netflow/scripts/HiveInit.sh
 /matatabi_script/importer/netflow/scripts/put-netflow.sh 20150701
+
+# sflow
+/matatabi_script/importer/sflow/scripts/HiveInit.sh
+cd /matatabi_script/importer/sflow/scripts
+mkdir tmp
+ln -s ../data/sflow_data_20150101.txt.gz
+ruby put-sflow.rb sflow_data_20150101.txt.gz 20150101 sflow
+rm -rf tmp
