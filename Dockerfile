@@ -79,6 +79,9 @@ RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport 
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 
 # additional packages
+RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
+RUN pip install matplotlib
+RUN pip install pandas
 RUN pip install pyhive
 
 # necoma-version nfdump
