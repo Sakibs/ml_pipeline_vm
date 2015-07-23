@@ -32,6 +32,14 @@ cd /tmp/data
 /matatabi_script/importer/netflow/scripts/HiveInit.sh
 /matatabi_script/importer/netflow/scripts/put-netflow.sh 20150701
 
+# add anonymized netflow data into hive
+hive -S -e "alter table netflow add partition (dt='20150531');"
+hive -S -e "alter table netflow add partition (dt='20150601');"
+wget http://hadoop-master.sekiya-lab.info/netflow-sschool/20150531.csv.lzo -O - | \
+hdfs dfs -put - /user/hive/warehouse/netflow/dt=20150531/20150531.csv.lzo
+wget http://hadoop-master.sekiya-lab.info/netflow-sschool/20150601.csv.lzo -O - | \
+hdfs dfs -put - /user/hive/warehouse/netflow/dt=20150601/20150601.csv.lzo
+
 # sflow
 /matatabi_script/importer/sflow/scripts/HiveInit.sh
 cd /matatabi_script/importer/sflow/scripts
