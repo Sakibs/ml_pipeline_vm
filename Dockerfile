@@ -60,11 +60,11 @@ ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/apache-hive-0.13.1-bin/lib/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/apache-hive-0.13.1-bin/lib/
 
 # presto
-RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.66/presto-server-0.66.tar.gz | tar -xz -C /usr/local/
-RUN cd /usr/local && ln -s ./presto-server-0.66 presto
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.125/presto-server-0.125.tar.gz | tar -xz -C /usr/local/
+RUN cd /usr/local && ln -s ./presto-server-0.125 presto
 RUN mkdir -p /usr/local/presto/etc
-RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.54/presto-cli-0.54-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
-RUN chmod 755 /usr/local/presto/bin/presto-cli-0.100-executable.jar
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.125/presto-cli-0.125-executable.jar > /usr/local/presto/bin/presto-cli-executable.jar
+RUN chmod 755 /usr/local/presto/bin/presto-cli-executable.jar
 RUN mkdir -p /home/hadoop/downloads/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/presto/plugin/hive-cdh5/
 ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/presto/plugin/hive-cdh5/
@@ -97,6 +97,7 @@ ADD hiveserver2.sh  /root/hiveserver2.sh
 ADD presto.config.properties /usr/local/presto/etc/config.properties
 ADD presto.jvm.config /usr/local/presto/etc/jvm.config
 ADD presto.catalog /usr/local/presto/etc/catalog/hive.properties
+ADD presto.node.properties /usr/local/presto/etc/node.properties
 ADD presto.sh /usr/local/presto/bin/presto
 RUN chmod 755 /usr/local/presto/bin/presto
 
