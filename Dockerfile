@@ -32,11 +32,9 @@ RUN chmod 600 /root/.ssh/config
 RUN chown root:root /root/.ssh/config
 
 # git clone matatabi_script 
-#RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
-#RUN git clone https://github.com/necoma/matatabi_script.git
 # install NECOMAtter
 ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
-# RUN service ssh start && /root/NECOMAtter-install.sh
+
 
 # java
 RUN mkdir -p /usr/java/default && \
@@ -77,12 +75,6 @@ ADD extlibs/json-hive-serde-1.0.jar /home/hadoop/downloads/json-hive-serde-1.0.j
 ENV HADOOP_PREFIX /usr/local/hadoop
 RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport HADOOP_PREFIX=/usr/local/hadoop\nexport HADOOP_HOME=/usr/local/hadoop\n:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
-
-# additional packages
-#RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
-#RUN pip install matplotlib
-#RUN pip install pandas
-#RUN pip install pyhive
 
 # necoma-version nfdump
 RUN git clone https://github.com/necoma/nfdump
@@ -142,13 +134,10 @@ RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 # install matatabi_script (git clone is already done.)
-#ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
-RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /etc/init.d/supervisor start #&& sleep 30 && /root/matatabi-hive-init.sh
+RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /etc/init.d/supervisor start 
 
 CMD ["/etc/bootstrap.sh", "-bash"]
-#CMD ["/etc/bootstrap.sh", "-d"]
 
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030 8080 10000
 
-# for NECOMAtter, neo4j
-#EXPOSE 8000 7474
+
