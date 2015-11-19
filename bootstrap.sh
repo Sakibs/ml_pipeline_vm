@@ -15,8 +15,8 @@ sed s/HOSTNAME/$HOSTNAME/ /usr/local/hadoop/etc/hadoop/core-site.xml.template > 
 
 service ssh start
 service mysql start
-/var/lib/neo4j/bin/neo4j start-no-wait
-/matatabi_script/NECOMAtter/NECOMAtter_service.sh start
+#/var/lib/neo4j/bin/neo4j start-no-wait
+#/matatabi_script/NECOMAtter/NECOMAtter_service.sh start
 $HADOOP_PREFIX/sbin/start-dfs.sh
 $HADOOP_PREFIX/sbin/start-yarn.sh
 
