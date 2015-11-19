@@ -18,7 +18,7 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
-RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison ruby nano gnuplot
+RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison ruby nano gnuplot npm
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -31,7 +31,8 @@ ADD ssh_config /root/.ssh/config
 RUN chmod 600 /root/.ssh/config
 RUN chown root:root /root/.ssh/config
 
-# git clone matatabi_script 
+RUN git clone git://github.com/tagomoris/shib.git
+#RUN cd shib/ && npm install
 # install NECOMAtter
 ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
 
