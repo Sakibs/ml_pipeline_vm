@@ -35,12 +35,12 @@ RUN chown root:root /root/.ssh/config
 #RUN git clone -b ${version} https://github.com/necoma/matatabi_script.git
 RUN git clone https://github.com/necoma/matatabi_script.git
 # install NECOMAtter
-# ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
-RUN service ssh start #&& /root/NECOMAtter-install.sh
+ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
+RUN service ssh start && /root/NECOMAtter-install.sh
 
 # java
 RUN mkdir -p /usr/java/default && \
-    curl -Ls 'http://download.oracle.com/otn-pub/java/jdk/7u79-b14/jdk-7u79-linux-x64.tar.gz' -H 'Cookie: oraclelicense=accept-securebackup-cookie' | \
+    curl -Ls 'http://download.oracle.com/otn-pub/java/jdk/8u66-b17/jdk-8u66-linux-x64.tar.gz' -H 'Cookie: oraclelicense=accept-securebackup-cookie' | \
     tar --strip-components=1 -xz -C /usr/java/default/
 
 ENV JAVA_HOME /usr/java/default/
@@ -62,10 +62,10 @@ ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/apache-hive-0.13.1-bin/lib/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/apache-hive-0.13.1-bin/lib/
 
 # presto
-RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.77/presto-server-0.77.tar.gz | tar -xz -C /usr/local/
-RUN cd /usr/local && ln -s ./presto-server-0.77 presto
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.66/presto-server-0.66.tar.gz | tar -xz -C /usr/local/
+RUN cd /usr/local && ln -s ./presto-server-0.66 presto
 RUN mkdir -p /usr/local/presto/etc
-RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.77/presto-cli-0.77-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
+RUN curl -s https://repo1.maven.org/maven2/com/facebook/presto/presto-cli/0.54/presto-cli-0.54-executable.jar > /usr/local/presto/bin/presto-cli-0.100-executable.jar
 RUN chmod 755 /usr/local/presto/bin/presto-cli-0.100-executable.jar
 RUN mkdir -p /home/hadoop/downloads/
 ADD extlibs/json-hive-serde-1.0.jar /usr/local/presto/plugin/hive-cdh5/
@@ -79,14 +79,14 @@ RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport 
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 
 # additional packages
-#RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
-#RUN pip install matplotlib
-#RUN pip install pandas
-#RUN pip install pyhive
+RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
+RUN pip install matplotlib
+RUN pip install pandas
+RUN pip install pyhive
 
 # necoma-version nfdump
-#RUN git clone https://github.com/necoma/nfdump
-#RUN cd /nfdump && ./configure  --prefix=/usr && make && make install
+RUN git clone https://github.com/necoma/nfdump
+RUN cd /nfdump && ./configure  --prefix=/usr && make && make install
 
 RUN mkdir $HADOOP_PREFIX/input
 RUN cp $HADOOP_PREFIX/etc/hadoop/*.xml $HADOOP_PREFIX/input
@@ -142,12 +142,13 @@ RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
 # install matatabi_script (git clone is already done.)
-
-RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh  && /etc/init.d/supervisor start && sleep 30 
+#ADD matatabi-hive-init.sh /root/matatabi-hive-init.sh 
+RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /etc/init.d/supervisor start #&& sleep 30 && /root/matatabi-hive-init.sh
 
 CMD ["/etc/bootstrap.sh", "-bash"]
 #CMD ["/etc/bootstrap.sh", "-d"]
 
-EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030
+EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030 8080 10000
 
 # for NECOMAtter, neo4j
+EXPOSE 8000 7474
