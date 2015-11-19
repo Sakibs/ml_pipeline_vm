@@ -79,10 +79,10 @@ RUN sed -i '/^export JAVA_HOME/ s:.*:export JAVA_HOME=/usr/java/default\nexport 
 RUN sed -i '/^export HADOOP_CONF_DIR/ s:.*:export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop/:' $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
 
 # additional packages
-RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
-RUN pip install matplotlib
-RUN pip install pandas
-RUN pip install pyhive
+#RUN apt-get install -y python-dev libfreetype6-dev libpng-dev
+#RUN pip install matplotlib
+#RUN pip install pandas
+#RUN pip install pyhive
 
 # necoma-version nfdump
 RUN git clone https://github.com/necoma/nfdump
@@ -151,4 +151,4 @@ CMD ["/etc/bootstrap.sh", "-bash"]
 EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030 8080 10000
 
 # for NECOMAtter, neo4j
-EXPOSE 8000 7474
+#EXPOSE 8000 7474
