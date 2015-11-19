@@ -36,7 +36,7 @@ RUN chown root:root /root/.ssh/config
 RUN git clone https://github.com/necoma/matatabi_script.git
 # install NECOMAtter
 ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
-RUN service ssh start && /root/NECOMAtter-install.sh
+# RUN service ssh start && /root/NECOMAtter-install.sh
 
 # java
 RUN mkdir -p /usr/java/default && \
