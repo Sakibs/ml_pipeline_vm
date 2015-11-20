@@ -12,6 +12,17 @@ cd $HADOOP_PREFIX/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; 
 # altering the core-site configuration
 sed s/HOSTNAME/$HOSTNAME/ /usr/local/hadoop/etc/hadoop/core-site.xml.template > /usr/local/hadoop/etc/hadoop/core-site.xml
 
+if [ ! -f /var/lib/mysql/ibdata1 ]; then
+    echo "initializing mysql"
+    sudo apt-get -y purge mysql-server-5.5
+    echo "mysql-server-5.5 mysql-server/root_password password password" | debconf-set-selections
+    echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
+    sudo apt-get -y install mysql-server-5.5
+
+    sudo service mysql start && mysql -u root -ppassword < /root/mysql-hive.sql
+else
+    echo "mysql initialized"
+fi
 
 service ssh start
 service mysql start

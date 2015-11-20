@@ -1,9 +1,9 @@
 # Creates pseudo distributed hadoop 2.2.0 on Ubuntu 14.04
 #
-# docker build -t necoma/matatabi .
+# docker build -t ksideris/presto_hive .
 
 FROM sequenceiq/pam:ubuntu-14.04
-MAINTAINER NECOMA
+MAINTAINER ksideris
 
 ENV version 1.0
 LABEL version=${version}
@@ -41,7 +41,7 @@ ADD NECOMAtter-install.sh /root/NECOMAtter-install.sh
 RUN mkdir -p /usr/java/default && \
     curl -Ls 'http://download.oracle.com/otn-pub/java/jdk/8u66-b17/jdk-8u66-linux-x64.tar.gz' -H 'Cookie: oraclelicense=accept-securebackup-cookie' | \
     tar --strip-components=1 -xz -C /usr/java/default/
-
+ 
 ENV JAVA_HOME /usr/java/default/
 ENV PATH /usr/local/presto/bin:/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH:$JAVA_HOME/bin
 
@@ -131,7 +131,6 @@ RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
 RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 2122" >> /etc/ssh/sshd_config
 
-# install matatabi_script (git clone is already done.)
 RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh && $HADOOP_PREFIX/sbin/start-dfs.sh && $HADOOP_PREFIX/sbin/start-yarn.sh && /etc/init.d/supervisor start 
 
 CMD ["/etc/bootstrap.sh", "-bash"]
