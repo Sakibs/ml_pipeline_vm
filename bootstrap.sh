@@ -33,6 +33,7 @@ $HADOOP_PREFIX/sbin/start-yarn.sh
 /etc/init.d/supervisor start
 /usr/local/presto/bin/launcher start
 
+exec airflow webserver -p 7000
 
 if [[ $1 == "-d" ]]; then
   while true; do sleep 1000; done
