@@ -19,6 +19,7 @@ RUN echo "mysql-server-5.5 mysql-server/root_password password password" | debco
 RUN echo "mysql-server-5.5 mysql-server/root_password_again password password" | debconf-set-selections
 RUN apt-get update
 RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison ruby nano gnuplot npm
+RUN apt-get install -y vim
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -102,6 +103,14 @@ ADD presto.node.properties /usr/local/presto/etc/node.properties
 ADD presto.sh /usr/local/presto/bin/presto
 RUN chmod 755 /usr/local/presto/bin/presto
 
+# airflow
+ENV AIRFLOW_HOME /usr/local/airflow
+RUN apt-get update
+# RUN apt-get upgrade gcc
+RUN apt-get install -y python-dev
+RUN pip install airflow
+RUN airflow initdb
+
 # fixing the libhadoop.so like a boss
 RUN rm  /usr/local/hadoop/lib/native/*
 ADD hadoop-native-64-2.2.0.tar.gz /usr/local/hadoop/lib/native/
@@ -135,6 +144,6 @@ RUN service ssh start && service mysql start && $HADOOP_PREFIX/etc/hadoop/hadoop
 
 CMD ["/etc/bootstrap.sh", "-bash"]
 
-EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030 8080 10000
+EXPOSE 50020 50090 50070 50010 50075 8031 8032 8033 8040 8042 49707 22 8088 8030 8080 10000 7000 7050 7070 7100 5555 8793
 
 
