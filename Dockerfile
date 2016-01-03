@@ -1,9 +1,9 @@
 # Creates pseudo distributed hadoop 2.2.0 on Ubuntu 14.04
 #
-# docker build -t ksideris/presto_hive .
+# docker build -t sakibs/presto_hive .
 
 FROM sequenceiq/pam:ubuntu-14.04
-MAINTAINER ksideris
+MAINTAINER sakibs
 
 ENV version 1.0
 LABEL version=${version}
@@ -21,6 +21,9 @@ RUN apt-get update
 RUN apt-get install -y curl tar sudo openssh-server openssh-client rsync git python-pip mysql-server lzop jq bison ruby nano gnuplot npm
 RUN apt-get install -y vim
 RUN apt-get install -y python-dev
+# install necessery items for scikit learn
+RUN apt-get install -y python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+RUN pip install scikit-learn
 
 # passwordless ssh
 RUN rm -f /etc/ssh/ssh_host_dsa_key /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
@@ -45,7 +48,7 @@ RUN mkdir -p /usr/java/default && \
     tar --strip-components=1 -xz -C /usr/java/default/
  
 ENV JAVA_HOME /usr/java/default/
-ENV PATH /usr/local/presto/bin:/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH:$JAVA_HOME/bin
+ENV PATH /usr/local/presto/bin:/usr/local/hadoop/bin:/usr/local/hadoop/sbin:/usr/local/apache-hive-0.13.1-bin/bin:$PATH:$JAVA_HOME/bin
 
 # hadoop
 RUN curl -s https://archive.apache.org/dist/hadoop/core/hadoop-2.2.0/hadoop-2.2.0.tar.gz | tar -xz -C /usr/local/
@@ -53,6 +56,7 @@ RUN cd /usr/local && ln -s ./hadoop-2.2.0 hadoop
 ADD extlibs/hadoop-lzo-0.4.15.jar /usr/local/hadoop/share/hadoop/common/
 
 # hive
+ENV HIVE_HOME /usr/local/apache-hive-0.13.1-bin/
 RUN curl -s https://archive.apache.org/dist/hive/hive-0.13.1/apache-hive-0.13.1-bin.tar.gz | tar -xz -C /usr/local/
 ADD hive-site.xml /usr/local/apache-hive-0.13.1-bin/conf/hive-site.xml
 ADD extlibs/mysql-connector-java-5.1.18-bin.jar /usr/local/apache-hive-0.13.1-bin/lib/mysql-connector-java-5.1.18-bin.jar
@@ -109,6 +113,13 @@ ENV AIRFLOW_HOME /usr/local/airflow
 RUN pip install airflow
 RUN airflow initdb
 ADD airflow.cfg ${AIRFLOW_HOME}/airflow.cfg
+
+# add python hive connector
+RUN pip install hive-thrift-py
+RUN apt-get install -y libsasl2-dev
+RUN pip install sasl
+RUN pip install thrift-sasl
+RUN pip install pyhive
 
 # fixing the libhadoop.so like a boss
 RUN rm  /usr/local/hadoop/lib/native/*
